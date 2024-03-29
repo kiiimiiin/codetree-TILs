@@ -91,12 +91,15 @@ int Remove() {
 		}
 	}
 
-	
 	// 2. 제초제 뿌림 , 뿌리기전 제초제 업데이트
+	
+	
 
 	for (int x = 0; x < n; x++)
 		for (int y = 0; y < n; y++)
 			if (rBoard[x][y]) rBoard[x][y]--;
+
+	if (mx == -0x7f7f7f7f) return 0; // EdheCase 확인!! 
 	
 	rBoard[cx][cy] = c;
 	board[cx][cy] = 0;
@@ -149,7 +152,7 @@ int main(void) {
 		Grow(); 
 		Copy();
 		ans += Remove();
-		//Test();
+		Test();
 	}
 
 	cout << ans; 
