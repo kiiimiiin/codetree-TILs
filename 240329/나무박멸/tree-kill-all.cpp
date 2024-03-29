@@ -152,7 +152,6 @@ int main(void) {
 		Grow(); 
 		Copy();
 		ans += Remove();
-		Test();
 	}
 
 	cout << ans; 
