@@ -107,27 +107,27 @@ void MakeSnailDir() {
 }
 
 void MoveTarget() {
-	int cdx[24] = { 
+	int cdx[25] = { 
 		3,
 		2, 2, 2,
 		1, 1, 1, 1, 1, 
-		0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0,
 		-1, -1,-1,-1, -1,
 		-2, -2, -2,
 		-3,
 	};
-	int cdy[24] = { 
+	int cdy[25] = { 
 		0,
 		-1, 0, 1,
 		-2, -1, 0, 1, 2,
-		-3, -2, -1, 1, 2, 3,
+		-3, -2, -1, 0, 1, 2, 3,
 		-2, -1, 0, 1, 2,
 		-1, 0, 1,
 		0,
 	};
 
 	vector<pair<int, int>> posForMoved; 
-	for (int dir = 0; dir < 24; dir++) {
+	for (int dir = 0; dir < 25; dir++) {
 		int nx = cx + cdx[dir];
 		int ny = cy + cdy[dir];
 		if (OOB(nx, ny)) continue;
