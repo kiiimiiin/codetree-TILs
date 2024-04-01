@@ -101,60 +101,51 @@ int GetArtScore() {
 }
 
 
+void SubRecRotate(int x, int y, int cBoard[32][32]) { // 기준좌표 x, y
+	int m = (n - 1) / 2;
 
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < m; j++) {
+			cBoard[j][m - 1 - i] = board[i + x][j + y];
+		}
+	}
+	// rotate할 기준좌표의 board영역을 (0,0)기준으로 rotate한채 backUp
+
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < m; j++) {
+			board[i + x][j + y] = cBoard[i][j];
+		}
+	}
+	// (0,0)기준으로 저장된 rotatedBoard를 기준좌표에 맞춰 기존 board에 복사 
+}
 
 void Rotate() {
 	// 1. SubCrossRotate
-	int mx, my;
-	mx = my = (n - 1) / 2;
+	int m = (n - 1) / 2;
 
 	int cdx[4] = { 0, 1, 0, -1 };
 	int cdy[4] = { 1, 0, -1, 0 };
 
 	for (int s = 1; s <= (n - 1) / 2; s++) {
 		for (int dir = 0; dir < 3; dir++) {
-			int nx = mx + s * cdx[dir];
-			int ny = my + s * cdy[dir];
-			int nnx = mx + s * cdx[dir + 1];
-			int nny = my + s * cdy[dir + 1];
+			int nx = m + s * cdx[dir];
+			int ny = m + s * cdy[dir];
+			int nnx = m + s * cdx[dir + 1];
+			int nny = m + s * cdy[dir + 1];
 			swap(board[nx][ny], board[nnx][nny]);
 		}
 	}
 	//2 .SubRecRotate
 
 	int cBoard[32][32] = {};
-	for (int i = 0; i < mx; i++)  // (0,0) 사각형 rotate
-		for (int j = 0; j < my; j++)
-			cBoard[j][mx -1 - i] = board[i][j];
 
-	for (int i = 0; i < mx; i++)
-		for (int j = 0; j < my; j++)
-			board[i][j] = cBoard[i][j];
-
-	for (int i = mx + 1; i < n; i++) // (mx + 1, 0) 사각형 rotate
-		for (int j = 0; j < my; j++)
-			cBoard[j][mx - 1 - (i -(mx + 1))] = board[i][j];
-
-	for (int i = 0; i < mx; i++) 
-		for (int j = 0; j < my; j++)
-			board[i + (mx + 1)][j] = cBoard[i][j];
-
-	for (int i = 0; i < mx; i++) // (0,my + 1) 사각형 rotate
-		for (int j = mx + 1; j < n; j++)
-			cBoard[j - (mx + 1)][mx -1 -i] = board[i][j];
-
-	for (int i = 0; i < mx; i++) 
-		for (int j = 0; j < my; j++)
-			board[i][j +(mx+1)] = cBoard[i][j];
-	 
-	for (int i = mx + 1; i < n; i++) // (mx + 1,my + 1) 사각형 rotate
-		for (int j = mx + 1; j < n; j++)
-			cBoard[j - (mx + 1)][mx - 1 - (i - (mx + 1))] = board[i][j];
-
-	for (int i = 0; i < mx; i++)  
-		for (int j = 0; j < my; j++)
-			board[i + (mx + 1)][j + (mx + 1)] = cBoard[i][j];
+	SubRecRotate(0, 0, cBoard);
+	SubRecRotate(m + 1, 0, cBoard);
+	SubRecRotate(0, m + 1, cBoard);
+	SubRecRotate(m + 1, m + 1, cBoard);
+	
 }
+
 
 int main(void) {
 	cin >> n;
