@@ -47,18 +47,10 @@ void MoveForMarket() {
 				int ny = cur.Y + dy[dir];
 				if (OOB(nx, ny) || dist[nx][ny] >= 0) continue;
 				if (board[nx][ny] == 2) continue; // 막힘
-				if (nx == p.px && ny == p.py) {
-					dist[nx][ny] = dist[cur.X][cur.Y] + 1;
-					findFlag = 1;
-					break;
-				}
 				dist[nx][ny] = dist[cur.X][cur.Y] + 1;
 				q.push({ nx,ny });
 			}
-			if (findFlag) break;
-		} // 최단거리 편의점 찾음
-
-		while (!q.empty()) q.pop();
+		} // 최단거리 찾음
 
 		int route[17][17] = {};
 		route[p.px][p.py] = 1;
@@ -76,7 +68,7 @@ void MoveForMarket() {
 					route[nx][ny] = 1;
 				}
 			}
-		} // 최단거리에 해당하는 루트찾음
+		} // 편의점에서 부터 최단거리에 해당하는 루트찾음
 
 		for (int dir = 0; dir < 4; dir++) {
 			int nx = p.x + dx[dir];
