@@ -35,21 +35,18 @@ int Move() {
 					// 탈출
 					m -= persons[i][j];
 					movedDist += persons[i][j];
-					persons[i][j] = 0; 
 					moveFlag = 1; break; 
 				}
 				else if (nMinDist < curMinDist) {
 					// 이동
 					movedDist += persons[i][j];
 					cPersons[nx][ny] += persons[i][j];
-					persons[i][j] = 0;
 					moveFlag = 1; break; 
 				}
 			}
 			if (moveFlag) continue;
 			// 움직이지 못함
 			cPersons[i][j] += persons[i][j];
-			persons[i][j] = 0;
 		}
 	}
 
