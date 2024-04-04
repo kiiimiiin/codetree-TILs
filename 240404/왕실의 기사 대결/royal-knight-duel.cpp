@@ -25,7 +25,7 @@ bool OOB(int x, int y) {
 	return (x < 0 || x >= l || y < 0 || y >= l);
 }
 
-bool IsMovedSpace(int idx, vector<int> movedIdxList) {
+bool IsMovedSpace(int idx, vector<int>& movedIdxList) {
 	if (idx == 0) return false;
 
 	for (auto movedIdx : movedIdxList) {
