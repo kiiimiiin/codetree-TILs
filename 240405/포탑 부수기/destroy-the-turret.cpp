@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <queue>
 #include <stack>
+#include <functional>
 #define X first 
 #define Y second
 using namespace std;
