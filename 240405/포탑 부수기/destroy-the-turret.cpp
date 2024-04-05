@@ -27,8 +27,7 @@ pair<int,int> ChooseAttacker() { // 가장 약한 포탑 선정
 				attackers.push_back({ board[i][j].first, i , j });
 			}
 		}
-	}
-	if (attackers.size() == 0) exit(0); 
+	} 
 
 	sort(attackers.begin(), attackers.end());
 	
@@ -80,7 +79,6 @@ pair<int, int> ChooseTarget(int ax, int ay) { // 가장 강한 포탑 선정
 			}
 		}
 	}
-	if (attackers.size() == 0) exit(0);
 
 	sort(attackers.begin(), attackers.end());
 
