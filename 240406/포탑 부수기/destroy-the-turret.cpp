@@ -236,7 +236,7 @@ void Attack(int ax, int ay) {
 int main(void) {
 	cin >> n >> m >> k;
 	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
+		for (int j = 0; j < m; j++) {
 			int stat; 
 			cin >> stat;
 			board[i][j].first = stat;
