@@ -20,7 +20,7 @@ int oneFlag;
 pair<int,int> ChooseAttacker() { // 가장 약한 포탑 선정
 	vector<tuple<int,int,int>> attackers; // 공격력, 좌표
 	int ax, ay;
-	
+
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
 			if (board[i][j].first > 0) {
@@ -35,7 +35,7 @@ pair<int,int> ChooseAttacker() { // 가장 약한 포탑 선정
 	if (attackers.size() >= 2) {
 
 		vector<tuple<int, int, int>> infos; // 공격 turn, 행열합, 열
-		int idx = -1;
+		int idx = attackers.size() - 1;
 		for (int i = 0; i < attackers.size() - 1; i++) {
 			int stat, nStat;
 			tie(stat, ignore, ignore) = attackers[i];
@@ -85,7 +85,7 @@ pair<int, int> ChooseTarget(int ax, int ay) { // 가장 강한 포탑 선정
 	if (attackers.size() >= 2) {
 
 		vector<tuple<int, int, int>> infos; // 공격 turn, 행열합, 열
-		int idx = -1;
+		int idx = 0;
 		for (int i = attackers.size() - 1; i >= 1; i--) {
 			int stat, bStat;
 			tie(stat, ignore, ignore) = attackers[i];
