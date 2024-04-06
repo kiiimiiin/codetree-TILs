@@ -17,8 +17,8 @@ int oneFlag;
 
 
 
-pair<int,int> ChooseAttacker() { // 가장 약한 포탑 선정
-	vector<tuple<int,int,int>> attackers; // 공격력, 좌표
+pair<int, int> ChooseAttacker() { // 가장 약한 포탑 선정
+	vector<tuple<int, int, int>> attackers; // 공격력, 좌표
 	int ax, ay;
 
 	for (int i = 0; i < n; i++) {
@@ -27,11 +27,11 @@ pair<int,int> ChooseAttacker() { // 가장 약한 포탑 선정
 				attackers.push_back({ board[i][j].first, i , j });
 			}
 		}
-	} 
+	}
 
 	sort(attackers.begin(), attackers.end());
-	
-	
+
+
 	if (attackers.size() >= 2) {
 
 		vector<tuple<int, int, int>> infos; // 공격 turn, 행열합, 열
@@ -50,7 +50,7 @@ pair<int,int> ChooseAttacker() { // 가장 약한 포탑 선정
 		}
 
 		sort(infos.begin(), infos.end());
-		
+
 		auto wAttacker = infos.back();
 		ax = get<1>(wAttacker) - get<2>(wAttacker);
 		ay = get<2>(wAttacker);
@@ -58,13 +58,13 @@ pair<int,int> ChooseAttacker() { // 가장 약한 포탑 선정
 	else if (attackers.size() == 1) {
 		auto wAttacker = attackers.front();
 		ax = get<1>(wAttacker);
-		ay = get<2>(wAttacker); 
+		ay = get<2>(wAttacker);
 	}
 
 	board[ax][ay].first += n + m;
 	board[ax][ay].second = t;
 	return { ax, ay };
-	
+
 }
 
 pair<int, int> ChooseTarget(int ax, int ay) { // 가장 강한 포탑 선정
@@ -73,7 +73,7 @@ pair<int, int> ChooseTarget(int ax, int ay) { // 가장 강한 포탑 선정
 
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
-			if (i == ax && j == ay) continue; 
+			if (i == ax && j == ay) continue;
 			if (board[i][j].first > 0) {
 				attackers.push_back({ board[i][j].first, i , j });
 			}
@@ -90,7 +90,7 @@ pair<int, int> ChooseTarget(int ax, int ay) { // 가장 강한 포탑 선정
 			int stat, bStat;
 			tie(stat, ignore, ignore) = attackers[i];
 			tie(bStat, ignore, ignore) = attackers[i - 1];
-			if (stat > bStat ) { idx = i; break; }
+			if (stat > bStat) { idx = i; break; }
 		}
 
 		for (int i = attackers.size() - 1; i >= idx; i--) { // 최저 공격력 포탑들에 대해서
@@ -120,7 +120,7 @@ pair<int, int> ProcessOOB(int nx, int ny) {
 	if (ny < 0) ny = m + ny;
 	if (ny >= m) ny = ny - m;
 
-	return { nx, ny }; 
+	return { nx, ny };
 }
 
 bool Laser(int ax, int ay, int tx, int ty) {
@@ -134,9 +134,9 @@ bool Laser(int ax, int ay, int tx, int ty) {
 		auto cur = q.front(); q.pop();
 		for (int dir = 0; dir < 4; dir++) {
 			int nx = cur.X + dx[dir];
-			int ny = cur.Y + dy[dir]; 
+			int ny = cur.Y + dy[dir];
 			tie(nx, ny) = ProcessOOB(nx, ny);
-			if (board[nx][ny].first == 0 || dist[nx][ny] >= 0) 
+			if (board[nx][ny].first == 0 || dist[nx][ny] >= 0)
 				continue;
 			dist[nx][ny] = dist[cur.X][cur.Y] + 1;
 			q.push({ nx,ny });
@@ -147,22 +147,22 @@ bool Laser(int ax, int ay, int tx, int ty) {
 	stack<pair<int, int>> s;
 	int route[12][12] = {};
 	s.push({ ax, ay });
-	while(route[tx][ty] != 1){
+	while (route[tx][ty] != 1) {
 		auto cur = s.top(); s.pop();
 		route[cur.X][cur.Y] = 1;
 		for (int dir = 3; dir >= 0; dir--) { // 상좌하우
 			int nx = cur.X + dx[dir];
 			int ny = cur.Y + dy[dir];
 			tie(nx, ny) = ProcessOOB(nx, ny);
-			if (dist[nx][ny] == -1 || route[nx][ny] == 1) 
-				continue; 
+			if (dist[nx][ny] == -1 || route[nx][ny] == 1)
+				continue;
 			if (dist[nx][ny] == dist[cur.X][cur.Y] - 1) {
 				s.push({ nx,ny });
 			}
 		}
 	} // 공격자부터 타겟까지 최단루트 탐색
 
-	
+
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
 			if (i == ax && j == ay) continue;
@@ -171,36 +171,37 @@ bool Laser(int ax, int ay, int tx, int ty) {
 					board[i][j].first -= board[ax][ay].first;
 				else
 					board[i][j].first -= board[ax][ay].first / 2;
-	
-				if (board[i][j].first < 0) 
+
+				if (board[i][j].first < 0)
 					board[i][j].first = 0;
 			}
 		}
 	}
+	return true;
 }
 
 void Bomb(int ax, int ay, int tx, int ty) {
 	int bx[9] = { 0,-1,-1,-1,0, 0,1,1,1 };
 	int by[9] = { 0,-1,0,1,-1,1,-1,0,1 };
-	
+
 	for (int dir = 0; dir < 9; dir++) {
 		int x = tx + bx[dir];
 		int y = ty + by[dir];
 		tie(x, y) = ProcessOOB(x, y);
 		if (x == ax && y == ay) continue;
 		if (board[x][y].first == 0) continue;
-		if(dir == 0)
+		if (dir == 0)
 			board[x][y].first -= board[ax][ay].first;
 		else
 			board[x][y].first -= board[ax][ay].first / 2;
-		
+
 		if (board[x][y].first < 0)
 			board[x][y].first = 0;
 	}
-	
+
 }
 
-void Copy(pair<int,int> desc[12][12], pair<int,int> src[12][12]) {
+void Copy(pair<int, int> desc[12][12], pair<int, int> src[12][12]) {
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < m; j++)
 			desc[i][j] = src[i][j];
@@ -208,9 +209,9 @@ void Copy(pair<int,int> desc[12][12], pair<int,int> src[12][12]) {
 
 void Attack(int ax, int ay) {
 	int tx, ty;
-	tie(tx, ty) = ChooseTarget(ax,ay);
+	tie(tx, ty) = ChooseTarget(ax, ay);
 
-	pair<int,int> cBoard[12][12];
+	pair<int, int> cBoard[12][12];
 	Copy(cBoard, board);
 
 	// 포탑공격 
@@ -222,7 +223,9 @@ void Attack(int ax, int ay) {
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
 			if (board[i][j].first == 0) continue;
-			if (i == ax && j == ay) continue;
+			if (i == ax && j == ay) {
+				cnt++; continue;
+			}
 			cnt++;
 			if (board[i][j].first == cBoard[i][j].first
 				&& board[i][j].second == cBoard[i][j].second)
@@ -237,7 +240,7 @@ int main(void) {
 	cin >> n >> m >> k;
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
-			int stat; 
+			int stat;
 			cin >> stat;
 			board[i][j].first = stat;
 			board[i][j].second = t; // 모든 포탑의 최근 공격turn은 0
@@ -248,9 +251,9 @@ int main(void) {
 		int ax, ay;
 
 		tie(ax, ay) = ChooseAttacker();
-		
+
 		Attack(ax, ay);
-		if (oneFlag) break; 
+		if (oneFlag) break;
 	}
 
 	// 가장 강한 포탑 공격력 출력
