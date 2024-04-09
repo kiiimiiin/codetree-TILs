@@ -108,6 +108,7 @@ bool Laser(int ax, int ay, int tx, int ty) {
 			}
 		}
 	}
+	return true;
 }
 
 void Bomb(int ax, int ay, int tx, int ty) {
