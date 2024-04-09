@@ -1,180 +1,233 @@
 #include <iostream>
-#include <algorithm>
-#include <queue>
-#include <utility>
 #include <tuple>
-#define X first 
-#define Y second 
+#include <queue>
+#include <cassert>
+
+#define MAX_N 20
+#define DIR_NUM 4
+#define RED 0
+#define ROCK -1
+#define EMPTY -2
+#define EMPTY_BUNDLE make_tuple(-1, -1, -1, -1)
+
 using namespace std;
+
+typedef tuple<int, int, int, int> Bundle;
+
 int n, m;
-int board[22][22];
-int dx[4] = { 1, 0, -1, 0 };
-int dy[4] = { 0, 1, 0, -1 };
 
-bool OOB(int nx, int ny) {
-	return (nx < 0 || nx >= n || ny < 0 || ny >= n);
+int grid[MAX_N][MAX_N];
+int temp[MAX_N][MAX_N];
+
+queue<pair<int, int> > bfs_q;
+bool visited[MAX_N][MAX_N];
+
+int ans;
+
+bool InRange(int x, int y) {
+    return 0 <= x && x < n && 0 <= y && y < n;
 }
 
-bool Cmp(pair<int, int>& p1, pair<int, int>&p2) { // 행, 열
-	if (p1.first != p2.first) return p1.first > p2.first;
-	return p2.second < p2.second; 
+// 같은 색이거나, 빨간색 폭탄인 경우에만 이동이 가능합니다.
+bool CanGo(int x, int y, int color) {
+    return InRange(x, y) && !visited[x][y] && (
+        grid[x][y] == color || grid[x][y] == RED
+    );
 }
 
-bool InfoCmp(tuple<int, int, int, int>& t1, tuple<int, int, int, int>& t2) {
-	// 크기, 빨간폭탄수, 기준점 x, y
-	if (get<0>(t1) != get<0>(t2)) return get<0>(t1) > get<0>(t2);
-	if (get<1>(t1) != get<1>(t2)) return get<1>(t1) < get<1>(t2);
-	if (get<2>(t1) != get<2>(t2)) return get<2>(t1) > get<2>(t2);
-	return get<3>(t1) < get<3>(t2);
+void BFS(int x, int y, int color) {
+    // visited 값을 초기화합니다.
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            visited[i][j] = false;
+
+    // 시작점을 표시합니다.
+    visited[x][y] = true;
+    bfs_q.push(make_pair(x, y));
+
+    int dx[DIR_NUM] = {0, 1, 0, -1};
+    int dy[DIR_NUM] = {1, 0, -1, 0};
+
+    // BFS 탐색을 수행합니다.
+    while(!bfs_q.empty()) {
+        pair<int, int> curr_pos = bfs_q.front();
+        int curr_x, curr_y;
+        tie(curr_x, curr_y) = curr_pos;
+        bfs_q.pop();
+
+        for(int i = 0; i < DIR_NUM; i++) {
+            int new_x = curr_x + dx[i];
+            int new_y = curr_y + dy[i];
+
+            if(CanGo(new_x, new_y, color)) {
+                bfs_q.push(make_pair(new_x, new_y));
+                visited[new_x][new_y] = true;
+            }
+        }
+    }
 }
 
-tuple<int,int,int,int> bfs(int x, int y, int vis[22][22]) {
-	queue<pair<int, int>> q;
-	vector<pair<int, int>> colorPos;
-	vector<pair<int, int>> redPos;
-	q.push({ x, y });
-	vis[x][y] = 1;
-	colorPos.push_back({ x,y });
-	int color = board[x][y];
-	int redCnt = 0;
-	int area = 0;
-	int sx, sy;
+// (x, y) 지점을 시작으로 bundle 정보를 계산해 반환합니다.
+Bundle GetBundle(int x, int y) {
+    // Step1. (x, y)를 시작으로 bfs 탐색을 진행합니다.
+    BFS(x, y, grid[x][y]);
 
-	while (!q.empty()) {
-		auto cur = q.front(); q.pop(); area++;
-		for (int dir = 0; dir < 4; dir++) {
-			int nx = cur.X + dx[dir];
-			int ny = cur.Y + dy[dir];
-			if (OOB(nx, ny) || vis[nx][ny]) continue;
-			if (board[nx][ny] == 0 || board[nx][ny] == color) { // 빨간색이거나 같은 유색
-				q.push({ nx, ny });
-				vis[nx][ny] = 1;
-				if (board[nx][ny] == 0) {
-					redPos.push_back({ nx,ny });
-				}
-				else if (board[nx][ny] == color) {
-					colorPos.push_back({ nx,ny });
-				}
-			}
-		}
-	}
+    // Step2. bundle 정보를 계산해 반환합니다.
+    int bomb_cnt = 0, red_cnt = 0;
+    pair<int, int> standard = make_pair(-1, -1);
 
-	redCnt = redPos.size();
-	for (auto pos : redPos) { // 다른 경우 방문을 위한 빨간색 방문 초기화
-		vis[pos.X][pos.Y] = 0;
-	}
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++) {
+            if(!visited[i][j])
+                continue;
 
-	// 유색 구슬 기준좌표 찾기 위한 sort
-	sort(colorPos.begin(), colorPos.end(), Cmp);
-	tie(sx, sy) = colorPos.front(); 
-	
-	return { area, redCnt, sx, sy }; // 크기, 빨간폭탄수, 기준점 x, y
+            bomb_cnt++;
+            
+            if(grid[i][j] == RED)
+                red_cnt++;
+            else if(make_pair(i, -j) > standard)
+                standard = make_pair(i, -j);
+        }
+    
+    int std_x, std_y;
+    tie(std_x, std_y) = standard;
+    return make_tuple(bomb_cnt, -red_cnt, std_x, std_y);
 }
 
-int BombGroup(int sx, int sy) {
-	int color = board[sx][sy];
-	int area = 0;
-	queue<pair<int, int>> q;
-	q.push({ sx, sy });
-	board[sx][sy] = -2;
+// 우선순위에 따라 쉽게 계산하기 위해
+// (폭탄 묶음의 크기, -빨간색 폭탄의 수, 행 번호, -열 번호)
+// 순서대로 값을 넣어줍니다.
+Bundle FindBestBundle() {
+    Bundle best_bundle = EMPTY_BUNDLE;
 
-	while (!q.empty()) {
-		auto cur = q.front(); q.pop(); area++;
-		for (int dir = 0; dir < 4; dir++) {
-			int nx = cur.X + dx[dir];
-			int ny = cur.Y + dy[dir];
-			if (OOB(nx, ny)) continue;
-			if (board[nx][ny] == 0 || board[nx][ny] == color) { // 빨간색이거나 같은 유색
-				q.push({ nx, ny });
-				board[nx][ny] = -2;
-				
-			}
-		}
-	}
-
-	return area;
+    // 빨간색이 아닌 폭탄들에 대해서만 전부 탐색합니다.
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            if(grid[i][j] >= 1) {
+                Bundle bundle = GetBundle(i, j);
+                if(bundle > best_bundle)
+                    best_bundle = bundle;
+            }
+    
+    return best_bundle;
 }
 
-int ProcessGroup() {
-	int vis[22][22] = {};
-	// 1. 그룹핑
-	vector<tuple<int, int, int, int>> infos;
-	int sx, sy;
-
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			if (board[i][j] >= 1 && !vis[i][j]) { // 그룹핑 되지 않은 유색구슬에 대해 
-				int area, redCnt, sx, sy;
-				tie(area, redCnt, sx, sy) = bfs(i, j, vis);
-				if(area >= 2)
-					infos.push_back({ area, redCnt, sx, sy });
-			}
-		}
-	}
-
-	if (infos.size() == 0) return -1;
-
-	sort(infos.begin(), infos.end(), InfoCmp);
-
-	tie(ignore, ignore, sx, sy) = infos.front();
-	// 2. 그룹 폭발
-	int area = BombGroup(sx, sy);
-	return area;
+void Remove(int col) {
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            if(visited[i][j]) {
+                assert(grid[i][j] == col || grid[i][j] == RED);
+                grid[i][j] = EMPTY;
+            }
 }
 
-void doGravity() {
-	for (int j = 0; j < n; j++) {
-		for (int i = n - 2; i >= 0; i--) {
-			if (board[i][j] >= 0) {
-				int ny = i + 1;
-				int tmp = board[i][j];
-				board[i][j] = -2;
-				while (ny <= n && board[ny][j] == -2) {
-					ny++;
-				}
-				board[ny - 1][j] = tmp;
-			}
-		}
-	}
+void Gravity() {
+    // Step1.
+    // 중력 작용을 쉽게 구현하기 위해
+    // temp 배열을 활용합니다.
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            temp[i][j] = EMPTY;
+    
+    // Step2.
+    for(int j = 0; j < n; j++) {
+        // 아래에서 위로 올라오면서
+        // 해당 위치에 폭탄이 있는 경우에만 temp에 
+        // 쌓아주는 식으로 코드를 작성할 수 있습니다.
+
+        // 단, 돌이 있는 경우에는
+        // 위에부터 쌓일 수 있도록 합니다.
+        int last_idx = n - 1;
+        for(int i = n - 1; i >= 0; i--) {
+            if(grid[i][j] == EMPTY)
+                continue;
+            if(grid[i][j] == ROCK)
+                last_idx = i;
+            temp[last_idx--][j] = grid[i][j];
+            
+        }
+    }
+    
+    // Step3. 다시 temp 배열을 옮겨줍니다.
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            grid[i][j] = temp[i][j];
 }
 
+// 반시계 방향으로 90' 만큼 회전합니다.
 void Rotate() {
-	int cBoard[22][22] = {}; 
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			cBoard[n - 1 - j][i] = board[i][j];
-		}
-	}
+    // Step1. 
+    // 회전 과정을 쉽게 구현하기 위해
+    // temp 배열을 활용합니다.
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            temp[i][j] = EMPTY;
 
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			board[i][j] = cBoard[i][j];
-		}
-	}
+    // Step2.
+    // 기존 격자를 반시계 방향으로 90도 회전했을 때의 결과를
+    // temp에 저장해줍니다.
+    for(int j = n - 1; j >= 0; j--)
+        for(int i = 0; i < n; i++)
+            temp[n - 1 - j][i] = grid[i][j];
+
+    // Step3.
+    // 다시 temp 배열을 옮겨줍니다.
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            grid[i][j] = temp[i][j];
 }
-void UpdateBoard() {
-	doGravity();
-	Rotate();
-	doGravity();
+
+void Clean(int x, int y) {
+    // Step1. (x, y)를 시작으로 지워야할 폭탄 묶음을 표시합니다.
+    BFS(x, y, grid[x][y]);
+
+    // Step2. 폭탄들을 전부 지워줍니다.
+    Remove(grid[x][y]);
+
+    // Step3. 중력이 작용합니다.
+    Gravity();
 }
 
+bool Simulate() {
+    // Step1. 크기가 최대인 폭탄 묶음을 찾습니다.
+    Bundle best_bundle = FindBestBundle();
 
-int main(void) {
-	cin >> n >> m;
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			cin >> board[i][j];
-		}
-	}
+    int bomb_cnt, x, y;
+    tie(bomb_cnt, ignore, x, y) = best_bundle;
 
-	int ans = 0;
+    // 만약 폭탄 묶음이 없다면, 종료합니다.
+    if(best_bundle == EMPTY_BUNDLE || bomb_cnt <= 1)
+        return false;
 
-	while (1) {
-		int bombedArea = ProcessGroup();
-		if (bombedArea == -1) break;
-		ans += bombedArea * bombedArea;
-		UpdateBoard();
-	}
+    // Step2. 선택된 폭탄 묶음에 해당하는 폭탄들을 전부 제거 후
+    //        중력이 작용합니다.
+    ans += bomb_cnt * bomb_cnt;
+    Clean(x, -y); 
 
-	cout << ans;
+    // Step3. 반시계 방향으로 90' 만큼 회전합니다.
+    Rotate();
+
+    // Step4. 중력이 작용합니다.
+    Gravity();
+
+    return true;
+}
+
+int main() {
+    cin >> n >> m;
+
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            cin >> grid[i][j];
+
+    // 끝나기 전까지 시뮬레이션을 반복합니다.
+    while(true) {
+        bool keep_going = Simulate();
+        
+        if(!keep_going)
+            break;
+    }
+
+    cout << ans;
+    return 0;
 }
