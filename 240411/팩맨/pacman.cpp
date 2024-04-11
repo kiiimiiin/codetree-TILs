@@ -10,7 +10,7 @@ int m, t;
 int px, py;
 int dx[8] = { -1,-1,0,1,1,1,0,-1 };
 int dy[8] = { 0,-1,-1,-1,0,1,1,1 };
-int monsters[5][5][9]; // 좌표에대한 몬스터 방향별 개수
+int monsters[5][5][8]; // 좌표에대한 몬스터 방향별 개수
 int dead[5][5]; // 시체 몬스터 보드 
 
 bool Cmp(tuple<int, int, int, int> &t1, tuple<int, int, int, int> &t2) {
@@ -24,7 +24,7 @@ bool OOB(int x, int y) {
 	return (x < 0 || x >= 4 || y < 0 || y >= 4);
 }
 void MonsterMove() {
-	int cMonsters[5][5][9] = {};
+	int cMonsters[5][5][8] = {};
 
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -41,8 +41,8 @@ void MonsterMove() {
 					ny = j + dy[md];
 					cnt++;
 				}
-				if (cnt >= 8) cMonsters[i][j][md]++;
-				else cMonsters[nx][ny][md]++;
+				if (cnt >= 8) cMonsters[i][j][k] = monsters[i][j][k];
+				else cMonsters[nx][ny][md] = monsters[i][j][k];
 			}
 		}
 	}
@@ -93,8 +93,8 @@ void PackMove() {
 			}
 
 			if (!IsVisited(pnx, pny, v)) {
-				for (auto cnt : monsters[pnx][pny]) {
-					eattenCnt += cnt;
+				for (int k = 0; k < 8; k++) {
+					eattenCnt += monsters[pnx][pny][k];
 				}
 				v.push_back({ pnx,pny });
 			}
@@ -137,7 +137,7 @@ void DeadReset() {
 			if (dead[i][j] >= 1) dead[i][j]--;
 }
 
-void CopyMonster(int cMonsters[5][5][9]) {
+void CopyMonster(int cMonsters[5][5][8]) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			for (int k = 0; k < 8; k++) {
@@ -147,7 +147,7 @@ void CopyMonster(int cMonsters[5][5][9]) {
 	}
 }
 
-void PasteMonster(int cMonsters[5][5][9]) {
+void PasteMonster(int cMonsters[5][5][8]) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			for (int k = 0; k < 8; k++) {
@@ -184,7 +184,7 @@ void Solve() {
 
 	for (int i = 1; i <= t; i++) {
 
-		int cMonsters[5][5][9];
+		int cMonsters[5][5][8] = {};
 		CopyMonster(cMonsters);
 		MonsterMove();
 		PackMove();
