@@ -35,14 +35,15 @@ void MonsterMove() {
 				int ny = j + dy[md];
 				int cnt = 0;
 				while ((nx == px && ny == py) || OOB(nx, ny)
-					 || dead[nx][ny] || cnt == 8) { // 팩맨이 있거나 격자벗어나거나 시체있으면 회전
+					 || dead[nx][ny]) { // 팩맨이 있거나 격자벗어나거나 시체있으면 회전
+					if (cnt >= 8) break;
 					md = (md + 1) % 8;
 					nx = i + dx[md];
 					ny = j + dy[md];
 					cnt++;
 				}
 
-				if (cnt == 8) cMonsters[i][j].push_back(md);
+				if (cnt >= 8) cMonsters[i][j].push_back(md);
 				else cMonsters[nx][ny].push_back(md);
 			}
 		}
