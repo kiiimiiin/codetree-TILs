@@ -119,7 +119,7 @@ void PackMove() {
 		pny = pny + pdy[dir];
 
 		for (int k = 0; k < 8; k++) {
-			if (monsters[pnx][pny] > 0) {
+			if (monsters[pnx][pny][k] > 0) {
 				monsters[pnx][pny][k] = 0;
 				dead[pnx][pny] = 3;
 			}
