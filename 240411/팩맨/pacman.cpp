@@ -13,6 +13,31 @@ int dy[8] = { 0,-1,-1,-1,0,1,1,1 };
 int monsters[5][5][8]; // 좌표에대한 몬스터 방향별 개수
 int dead[5][5]; // 시체 몬스터 보드 
 
+void TestBoard() {
+	cout << "\n";
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			int num = 0;
+			for (int k = 0; k < 8; k++) {
+				num += monsters[i][j][k];
+			}
+			cout << num << " ";
+		}
+		cout << "\n";
+	}
+
+	cout << "\n";
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if(i == px && j == py) cout << "P" << " ";
+			else cout << "0 ";
+		}
+		cout << "\n";
+	}
+}
+
+
+
 bool Cmp(tuple<int, int, int, int> &t1, tuple<int, int, int, int> &t2) {
 	if (get<0>(t1) != get<0>(t2)) return get<0>(t1) > get<0>(t2);
 	if (get<1>(t1) != get<1>(t2)) return get<1>(t1) < get<1>(t2);
@@ -41,8 +66,8 @@ void MonsterMove() {
 					ny = j + dy[md];
 					cnt++;
 				}
-				if (cnt >= 8) cMonsters[i][j][k] = monsters[i][j][k];
-				else cMonsters[nx][ny][md] = monsters[i][j][k];
+				if (cnt >= 8) cMonsters[i][j][k] += monsters[i][j][k];
+				else cMonsters[nx][ny][md] += monsters[i][j][k];
 			}
 		}
 	}
