@@ -84,7 +84,7 @@ void GoToMarket() {
 				int nx = cur.X + dx[dir];
 				int ny = cur.Y + dy[dir];
 				if (OOB(nx, ny) || dist[nx][ny] >= 0) continue;
-				if (board[nx][ny] == 2 && (nx != p.x && ny != p.y)) 
+				if (board[nx][ny] == 2 && !(nx == p.x && ny == p.y)) 
 					continue; // 현재 위치 제외한 막힌공간
 				dist[nx][ny] = dist[cur.X][cur.Y] + 1;
 				q.push({ nx, ny });
