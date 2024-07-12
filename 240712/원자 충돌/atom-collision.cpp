@@ -28,8 +28,8 @@ void Simulate() {
 			for (auto a : board[i][j]) {
 				int m, s, dir;
 				tie(m, s, dir) = a;
-				int nx = i + s * dx[dir];
-				int ny = j + s * dy[dir];
+				int nx = i + ( s % n ) * dx[dir];
+				int ny = j + ( s % n ) * dy[dir];
 				tie(nx, ny) = ProcessOOB(nx, ny);
 				cBoard[nx][ny].push_back({ m, s, dir });
 			}
@@ -40,8 +40,10 @@ void Simulate() {
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n; j++) {
 			if (cBoard[i][j].size() >= 2) {
-				int nm, ns, dirFlag;
+				int nm, ns, dirFlag, aNum;
 				nm = ns = dirFlag = 0;
+				aNum = cBoard[i][j].size();
+
 				for (auto a : cBoard[i][j]) {
 					int m, s, dir; 
 					tie(m, s, dir) = a;
@@ -50,11 +52,11 @@ void Simulate() {
 					dirFlag += dir % 2;
 				}
 				nm = nm / 5; 
-				ns = ns / cBoard[i][j].size(); 
+				ns = ns / aNum; 
 				cBoard[i][j].clear(); 
 				if (nm < 1) continue;
 				
-				if (dirFlag == 0 || dirFlag == 4) {
+				if (dirFlag == 0 || dirFlag == aNum) {
 					for (int ndir : {0, 2, 4, 6})
 						cBoard[i][j].push_back({ nm, ns, ndir });
 				}
@@ -97,6 +99,7 @@ int main(void) {
 		y = y - 1;
 		board[x][y].push_back({ m,s,d });
 	}
+
 
 	for (int i = 1; i <= k; i++) {
 		Simulate();
