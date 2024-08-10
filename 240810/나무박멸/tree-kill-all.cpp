@@ -92,7 +92,7 @@ int Remove() {
 		}
 	}
 
-	// if (mx == -0x7f7f7f7f) return 0; // 박멸하는 경우가 없음
+	if (mx == -0x7f7f7f7f) return 0; // 박멸하는 경우가 없음
 
 	// 2. 박멸
 	board[pos.X][pos.Y] = 0; 
