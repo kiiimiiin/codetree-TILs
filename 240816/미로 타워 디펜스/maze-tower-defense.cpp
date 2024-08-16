@@ -101,7 +101,7 @@ int Remove() {
 
 void Copy() {
 	int num = n * n - 1;
-	int tmp[630] = {};
+	int tmp[1300] = {};
 	int end;
 	int cnt = 1;
 	int i, k;
