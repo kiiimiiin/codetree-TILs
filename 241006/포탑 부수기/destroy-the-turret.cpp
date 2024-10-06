@@ -160,7 +160,7 @@ int main() {
 	for (t = 1; t <= k; t++) {
 		int ax, ay, ex, ey;
 		tie(ax, ay, ex, ey) = getPoint();
-		if (ax == ex && ay == ey) break;
+		//if (ax == ex && ay == ey) break;
 		
 		board[ax][ay].a += n + m;
 
