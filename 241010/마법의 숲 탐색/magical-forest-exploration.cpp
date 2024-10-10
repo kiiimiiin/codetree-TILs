@@ -114,12 +114,12 @@ int Down(int idx) {
 	
 	while (1) {
 		if (IsLeftPossible(x, y)) {
-			y = y--;
+			y = y - 1;
 			d = (d - 1) % 4;
 			getDownPos(x, y);
 		}
 		else if (IsRightPossible(x, y)) {
-			y = y++;
+			y = y + 1;
 			d = (d + 1) % 4;
 			getDownPos(x, y);
 		}
