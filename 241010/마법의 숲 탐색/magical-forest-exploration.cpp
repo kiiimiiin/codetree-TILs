@@ -11,7 +11,6 @@ const int dx[4] = { -1, 0, 1, 0 };
 const int dy[4] = { 0, 1, 0, -1 };
 int board[75][72];
 int vis[75][72];
-int nxr[72];
 
 struct Gollem {
 	int c, d;
@@ -74,7 +73,6 @@ void getDownPos(int& x, int& y) {
 		else q.push({ cur.X + 1, cur.Y });
 	}
 
-	//return make_pair(x, y);
 }
 
 int getScore(int x, int y, int idx) {
@@ -84,13 +82,13 @@ int getScore(int x, int y, int idx) {
 	for (int dir = 0; dir < 4; dir++) {
 		int nx = x + dx[dir];
 		int ny = y + dy[dir];
-		if (board[nx][ny] == -1) {
+		if (board[nx][ny] == -idx) {
 			for (int ndir = 0; ndir < 4; ndir++) {
 				int nnx = nx + dx[ndir];
 				int nny = ny + dy[ndir];
 				if (OOB(nnx, nny)) continue;
-				if (board[nnx][nny] != idx && board[nnx][nny] > 0) {
-					int nidx = board[nnx][nny];
+				if (board[nnx][nny] != idx && board[nnx][nny] != 0) {
+					int nidx = abs(board[nnx][nny]);
 					score = max(score, gollem[nidx].score);
 				}
 			}
@@ -130,13 +128,14 @@ int Down(int idx) {
 	if (x >= 0 && x <= 3)
 		return -1;
 	
-	board[x][y] = idx;
+	
 	for (int dir = 0; dir < 4; dir++) {
 		int nx = x + dx[dir];
 		int ny = y + dy[dir];
-		if(dir == d) board[nx][ny] = -1;
+		if(dir == d) board[nx][ny] = -idx;
 		else board[nx][ny] = idx;
 	}
+	board[x][y] = idx;
 
 	int score = getScore(x, y, idx);
 	gollem[idx].score = score;
