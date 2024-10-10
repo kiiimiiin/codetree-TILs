@@ -59,57 +59,38 @@ bool IsDownPossible(int x, int y) {
 	return true;
 }
 
-void getDownPos(int& x, int& y) {
+
+int getScore(int x, int y, int idx) {
+	// 다른 idx랑 연결이 되어있으면 그 점수 중 가장 큰놈 ( bfs로해야 예외없 ) 
+	int score = x + 1;
 	queue<pair<int, int>> q;
-	const int dgdx[3] = { 1, 2, 1 };
-	const int dgdy[3] = { -1, 0, 1 };
+	for (int i = 0; i < r; i++) fill(vis[i], vis[i] + c, 0);
 	q.push({ x, y });
+	vis[x][y] = 1;
 
 	while (!q.empty()) {
 		auto cur = q.front(); q.pop();
-		bool findSpace = false;
-		for (int dir = 0; dir < 3; dir++) {
-			int nx = cur.X + dgdx[dir];
-			int ny = cur.Y + dgdy[dir];
-			if (OOB(nx, ny) || board[nx][ny]) {
-				findSpace = true;
-				break;
-			}
-		}
-
-		if (findSpace) {
-			x = cur.X;
-			y = cur.Y;
-			break;
-		}
-		else q.push({ cur.X + 1, cur.Y });
-	}
-
-}
-
-int getScore(int x, int y, int idx) {
-	// 다른 idx랑 연결이 되어있으면 그 점수 중 가장 큰놈
-	int score = x + 1;
-
-	for (int dir = 0; dir < 4; dir++) {
-		int nx = x + dx[dir];
-		int ny = y + dy[dir];
-		if (board[nx][ny] == -idx) {
-			for (int ndir = 0; ndir < 4; ndir++) {
-				int nnx = nx + dx[ndir];
-				int nny = ny + dy[ndir];
-				if (OOB(nnx, nny)) continue;
-				if (board[nnx][nny] != idx && board[nnx][nny] != 0) {
-					int nidx = abs(board[nnx][nny]);
-					score = max(score, gollem[nidx].score);
+		score = max(score, cur.X);
+		for (int dir = 0; dir < 4; dir++) {
+			int nx = cur.X + dx[dir];
+			int ny = cur.Y + dy[dir];
+			if (OOB(nx, ny) || vis[nx][ny] || !board[nx][ny]) continue;
+			if (board[cur.X][cur.Y] > 0) {
+				if (board[cur.X][cur.Y] == abs(board[nx][ny])) {
+					vis[nx][ny] = 1;
+					q.push({ nx,ny });
 				}
 			}
+			else if (board[cur.X][cur.Y] < 0) {
+				vis[nx][ny] = 1;
+				q.push({ nx,ny });
+			}
 		}
 	}
 
-	
 	return score;
 }
+
 int Down(int idx) {
 	auto g = gollem[idx];
 	
@@ -119,25 +100,27 @@ int Down(int idx) {
 	int y = g.c;
 	int d = g.d;
 
-	//getDownPos(x, y);
 	
 	
 	while (1) {
 		if (IsDownPossible(x, y)) {
 			x = x + 1;
+			continue;
 		}
 		else if (IsLeftPossible(x, y)) {
 			y = y - 1;
 			x = x + 1;
 			d = (d + 3) % 4;
+			continue;
 		}
 		else if (IsRightPossible(x, y)) {
 			y = y + 1;
 			x = x + 1;
 			d = (d + 1) % 4;
+			continue;
 		}
-		else
-			break;
+
+		break;
 	}
 
 	if (x >= 0 && x <= 3)
