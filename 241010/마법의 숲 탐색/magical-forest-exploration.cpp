@@ -47,6 +47,18 @@ bool IsRightPossible(int x, int y) {
 	return true;
 }
 
+bool IsDownPossible(int x, int y) {
+	const int dgdx[3] = { 1, 2, 1 };
+	const int dgdy[3] = { -1, 0, 1 };
+
+	for (int dir = 0; dir < 3; dir++) {
+		int nx = x + dgdx[dir];
+		int ny = y + dgdy[dir];
+		if (OOB(nx, ny) || board[nx][ny]) return false;
+	}
+	return true;
+}
+
 void getDownPos(int& x, int& y) {
 	queue<pair<int, int>> q;
 	const int dgdx[3] = { 1, 2, 1 };
@@ -107,19 +119,20 @@ int Down(int idx) {
 	int y = g.c;
 	int d = g.d;
 
-	getDownPos(x, y);
+	//getDownPos(x, y);
 	
 	
 	while (1) {
-		if (IsLeftPossible(x, y)) {
+		if (IsDownPossible(x, y)) {
+			x = x + 1;
+		}
+		else if (IsLeftPossible(x, y)) {
 			y = y - 1;
 			d = (d + 3) % 4;
-			getDownPos(x, y);
 		}
 		else if (IsRightPossible(x, y)) {
 			y = y + 1;
 			d = (d + 1) % 4;
-			getDownPos(x, y);
 		}
 		else
 			break;
