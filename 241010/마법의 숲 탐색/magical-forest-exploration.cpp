@@ -128,10 +128,12 @@ int Down(int idx) {
 		}
 		else if (IsLeftPossible(x, y)) {
 			y = y - 1;
+			x = x + 1;
 			d = (d + 3) % 4;
 		}
 		else if (IsRightPossible(x, y)) {
 			y = y + 1;
+			x = x + 1;
 			d = (d + 1) % 4;
 		}
 		else
