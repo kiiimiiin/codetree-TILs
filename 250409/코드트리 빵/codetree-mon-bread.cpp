@@ -69,6 +69,8 @@ void MoveToMarket() {
 				int ny = cur.Y + dy[dir];
 				if (OOB(nx, ny) || dist[nx][ny] >= 0) 
 					continue;
+				if (board[nx][ny] == 2 && !(nx == person[idx].x && ny == person[idx].y))
+					continue;
 				q.push({ nx,ny });
 				dist[nx][ny] = dist[cur.X][cur.Y] + 1;
 			}
